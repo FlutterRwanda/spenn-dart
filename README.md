@@ -1,5 +1,5 @@
 # spenn
-SENN Sdk for Dart and Flutter written in Dart
+An SDK for the SPENN Business Partner API written in Dart for Dart and Flutter.
 
 [![style: very good analysis][very_good_analysis_badge]][very_good_analysis_link]
 [![License: MIT][license_badge]][license_link]
