@@ -21,7 +21,7 @@ class Spenn {
   @visibleForTesting
   static const authority = 'uat-idsrv.spenn.com';
 
-  /// Autenticate a Business Partner account. 
+  /// Autenticate a Business Partner account.
   /// Returns an instance of [SpennSession]
   Future<SpennSession> authenticate({
     String grantType = 'api_key',

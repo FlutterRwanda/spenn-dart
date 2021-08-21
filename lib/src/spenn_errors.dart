@@ -13,6 +13,8 @@ class SpennHttpRequestFailure implements SpennException {
 
   /// The status code of the response.
   final int statusCode;
+
+  /// Request's body
   final Map? body;
 }
 

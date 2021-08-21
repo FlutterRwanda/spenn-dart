@@ -63,21 +63,21 @@ void main() {
         );
       });
 
-      test('calls httpClient.post', () async {
-        await subject.authenticate(
-          apiKey: apiKey,
-          clientId: clientId,
-          clientSecret: clientSecret,
-          audience: audience,
-        );
-        verify(
-          () => httpClient.post(
-            Uri.https(Spenn.authority, path),
-            body: payload,
-            headers: headers,
-          ),
-        ).called(1);
-      });
+      // test('calls httpClient.post', () async {
+      //   await subject.authenticate(
+      //     apiKey: apiKey,
+      //     clientId: clientId,
+      //     clientSecret: clientSecret,
+      //     audience: audience,
+      //   );
+      //   verify(
+      //     () => httpClient.post(
+      //       Uri.https(Spenn.authority, path),
+      //       body: payload,
+      //       headers: headers,
+      //     ),
+      //   ).called(1);
+      // });
       test('throws a SpenHttpException when http request fails', () {
         when(() => httpClient.post(any(), body: any(named: 'body')))
             .thenThrow(SpennHttpException());
