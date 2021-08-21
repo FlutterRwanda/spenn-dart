@@ -15,9 +15,9 @@ class PaymentRequest extends Equatable {
 
   /// Generates a new instance of [PaymentRequest] from a given map of data
   factory PaymentRequest.fromMap(Map<String, dynamic> data) => PaymentRequest(
-        requestId: data['amount'] as String,
-        id: data['phoneNumber'] as String,
-        status: data['messsage'] as String,
+        requestId: data['requestId'] as String,
+        id: data[r'$id'] as String,
+        status: data['status'] as String,
       );
 
   /// ID
@@ -35,9 +35,9 @@ class PaymentRequest extends Equatable {
   /// Parses the current instance of [PaymentRequest]
   /// into a [Map<String,dynamic>]
   Map<String, dynamic> toMap() => <String, dynamic>{
-        'phoneNumber': id,
-        'amount': requestId,
-        'message': status,
+        r'$id': id,
+        'requestId': requestId,
+        'status': status,
       };
 
   /// Copies the current [PaymentRequest] while changing the specified fields.

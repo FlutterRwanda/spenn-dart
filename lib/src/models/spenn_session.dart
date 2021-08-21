@@ -74,7 +74,7 @@ class SpennSession extends Equatable {
 
   /// Parses the current instance of [SpennSession] into a [Map<String,dynamic>]
   Map<String, dynamic> toMap() => <String, dynamic>{
-        'access__token': token,
+        'access_token': token,
         'token_type': tokenType,
         'expires_in': lifespan,
         'type': accountType,
