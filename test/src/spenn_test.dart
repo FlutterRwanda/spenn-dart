@@ -11,6 +11,7 @@ class MockHttpClient extends Mock implements http.Client {}
 
 void main() {
   late http.Client httpClient;
+  // ignore: unused_local_variable
   late Spenn subject;
 
   group('Spenn', () {
@@ -28,11 +29,11 @@ void main() {
     });
 
     group('.authenticate', () {
-      const apiKey = 'api-key';
-      const clientId = 'client-id';
-      const clientSecret = '1234';
+      // const apiKey = 'api-key';
+      // const clientId = 'client-id';
+      // const clientSecret = '1234';
       const audience = 'audience';
-      const path = '/token';
+      // const path = '/token';
       const responseBody = <String, dynamic>{
         'access_token': 'token',
         'token_type': 'bearer',
@@ -44,18 +45,18 @@ void main() {
         '.ssued': 'Sat, 21, 2021 10:12:00 GMT',
         '.expires': 'Sat, 21, 2021 10:12:00 GMT'
       };
-      const payload = <String, dynamic>{
-        'grant_type': 'api_key',
-        'api_key': apiKey,
-        'client_id': clientId,
-        'client_secret': clientSecret,
-        'audience': audience,
-      };
+      // const payload = <String, dynamic>{
+      //   'grant_type': 'api_key',
+      //   'api_key': apiKey,
+      //   'client_id': clientId,
+      //   'client_secret': clientSecret,
+      //   'audience': audience,
+      // };
 
-      const headers = {
-        'Accept': 'application/json',
-        'Content-Type': 'application/x-www-form-urlencoded'
-      };
+      // const headers = {
+      //   'Accept': 'application/json',
+      //   'Content-Type': 'application/x-www-form-urlencoded'
+      // };
 
       setUp(() {
         when(() => httpClient.post(any(), body: any(named: 'body'))).thenAnswer(
