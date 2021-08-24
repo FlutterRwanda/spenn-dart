@@ -74,39 +74,32 @@ class Spenn {
 
   /// Sends a payment request to a user from a Business Partner.
   /// Returns an instance of [PaymentRequest].
-  Future<PaymentRequest> requestPayment({
-    required String token,
+  Future<PaymentRequest> createRequest({
     required String phoneNumber,
     required double amount,
     required String message,
+    required String externalReference,
+    required String apiKey,
   }) async {
     final uri = Uri.https(authority, '/api/Partner/transaction/request');
-    final body = <String, dynamic>{
+    final payload = <String, dynamic>{
       'phoneNumber': phoneNumber,
       'amount': amount,
       'message': message,
+      'externalReference': externalReference,
     };
-
     http.Response res;
 
     try {
-      res = await _httpClient.post(
-        uri,
-        body: body,
-        headers: {
-          'Authorization': 'Basic $token',
-          'Content-Type': 'application/json',
-        },
-      );
+      res = await http.post(uri, body: payload, headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $apiKey'
+      });
     } catch (_) {
       throw SpennHttpException();
     }
-
     if (res.statusCode != 200) {
-      throw SpennHttpRequestFailure(
-        statusCode: res.statusCode,
-        body: json.decode(res.body) as Map?,
-      );
+      throw SpennHttpRequestFailure(statusCode: res.statusCode);
     }
 
     Map data;
