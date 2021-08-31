@@ -7,10 +7,12 @@ import 'package:equatable/equatable.dart';
 /// {@endtemplate payment_request}
 class PaymentRequest extends Equatable {
   /// {@macro payment_request}
+  /// Creates a new instance of [PaymentRequest]
   const PaymentRequest({
     required this.requestId,
     required this.id,
     required this.status,
+    this.externalRef,
   });
 
   /// Generates a new instance of [PaymentRequest] from a given map of data
@@ -18,6 +20,7 @@ class PaymentRequest extends Equatable {
         requestId: data['requestId'] as String,
         id: data[r'$id'] as String,
         status: data['status'] as String,
+        externalRef: data['externalReference'] as String,
       );
 
   /// ID
@@ -29,8 +32,11 @@ class PaymentRequest extends Equatable {
   /// Status of the payment request
   final String status;
 
+  /// External reference
+  final String? externalRef;
+
   @override
-  List<Object?> get props => [id, requestId, status];
+  List<Object?> get props => [id, requestId, status, externalRef];
 
   /// Parses the current instance of [PaymentRequest]
   /// into a [Map<String,dynamic>]
@@ -38,6 +44,7 @@ class PaymentRequest extends Equatable {
         r'$id': id,
         'requestId': requestId,
         'status': status,
+        'externalReference': externalRef,
       };
 
   /// Copies the current [PaymentRequest] while changing the specified fields.
@@ -45,10 +52,12 @@ class PaymentRequest extends Equatable {
     String? requestId,
     String? id,
     String? status,
+    String? externalRef,
   }) =>
       PaymentRequest(
         requestId: requestId ?? this.requestId,
         id: id ?? this.id,
         status: status ?? this.status,
+        externalRef: externalRef ?? this.externalRef,
       );
 }

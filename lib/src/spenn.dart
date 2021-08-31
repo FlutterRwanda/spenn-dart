@@ -1,6 +1,4 @@
-import 'dart:convert';
-
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 import 'package:meta/meta.dart';
 import 'package:spenn/src/models/models.dart';
 import 'package:spenn/src/spenn_errors.dart';
@@ -10,10 +8,10 @@ import 'package:spenn/src/spenn_errors.dart';
 /// {@endtemplate}
 class Spenn {
   /// {@macro spenn}
-  Spenn({http.Client? httpClient}) : _httpClient = httpClient ?? http.Client();
+  Spenn({Dio? dio}) : _dio = dio ?? Dio();
 
   /// An http Client object to handle http requests
-  final http.Client _httpClient;
+  final Dio _dio;
 
   /// API authority.
   ///
@@ -39,17 +37,12 @@ class Spenn {
       'audience': audience,
     };
 
-    http.Response res;
+    Response<Map<String, dynamic>> res;
+    _dio.options.headers['Accept'] = 'application/json';
+    _dio.options.contentType = Headers.formUrlEncodedContentType;
+
     try {
-      res = await _httpClient.post(
-        uri,
-        body: body,
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        encoding: Encoding.getByName('utf-8'),
-      );
+      res = await _dio.postUri<Map<String, dynamic>>(uri, data: body);
     } catch (_) {
       throw SpennHttpException();
     }
@@ -58,15 +51,12 @@ class Spenn {
       throw SpennHttpRequestFailure(statusCode: res.statusCode);
     }
 
-    Map data;
-    try {
-      data = json.decode(res.body) as Map;
-    } catch (_) {
-      throw SpennJsonDecodeException();
+    if (res.data == null || res.data!.isEmpty) {
+      throw SpennTypeError();
     }
 
     try {
-      return SpennSession.fromMap(data as Map<String, dynamic>);
+      return SpennSession.fromMap(res.data!);
     } catch (_) {
       throw SpennJsonDeserializationException();
     }
@@ -79,7 +69,7 @@ class Spenn {
     required double amount,
     required String message,
     required String externalReference,
-    required String apiKey,
+    required String token,
   }) async {
     final uri = Uri.https(authority, '/api/Partner/transaction/request');
     final payload = <String, dynamic>{
@@ -88,29 +78,91 @@ class Spenn {
       'message': message,
       'externalReference': externalReference,
     };
-    http.Response res;
+    Response<Map<String, dynamic>> res;
 
     try {
-      res = await http.post(uri, body: payload, headers: <String, String>{
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $apiKey'
-      });
+      _dio.options.headers['Authorization'] = 'Bearer $token';
+      res = await _dio.postUri(uri, data: payload);
     } catch (_) {
       throw SpennHttpException();
     }
     if (res.statusCode != 200) {
-      throw SpennHttpRequestFailure(statusCode: res.statusCode);
+      throw SpennHttpRequestFailure(statusCode: res.statusCode, body: res.data);
     }
 
-    Map data;
+    if (res.data == null || res.data!.isEmpty) {
+      throw SpennTypeError();
+    }
+
     try {
-      data = json.decode(res.body) as Map;
+      return PaymentRequest.fromMap(res.data!);
     } catch (_) {
-      throw SpennJsonDecodeException();
+      throw SpennJsonDeserializationException();
+    }
+  }
+
+  /// Cancel a payment request
+  Future<PaymentRequest> cancelRequest({
+    required String requestMoneyGuid,
+    required String token,
+  }) async {
+    final uri = Uri.https(authority, '/api/Partner/transaction/request/cancel');
+    final payload = <String, String>{'requestMoneyGuid': requestMoneyGuid};
+
+    Response<Map<String, dynamic>> res;
+
+    try {
+      _dio.options.headers['Authorization'] = 'Bearer $token';
+      res = await _dio.postUri(uri, data: payload);
+    } catch (_) {
+      throw SpennHttpException();
+    }
+    if (res.statusCode != 200) {
+      throw SpennHttpRequestFailure(statusCode: res.statusCode, body: res.data);
+    }
+
+    if (res.data == null || res.data!.isEmpty) {
+      throw SpennTypeError();
     }
 
     try {
-      return PaymentRequest.fromMap(data as Map<String, dynamic>);
+      return PaymentRequest.fromMap(res.data!);
+    } catch (_) {
+      throw SpennJsonDeserializationException();
+    }
+  }
+
+  /// Check the status of the payment request at the specified [requestGuid]
+  /// Returns a new [DetailedPaymentRequest] object.
+  Future<DetailedPaymentRequest> checkRequestStatus({
+    required String requestGuid,
+    required String token,
+  }) async {
+    final uri =
+        Uri.https(authority, '/api/Partner/transaction/request/$requestGuid');
+    Response<Map<String, dynamic>> res;
+    final payload = <String, String>{'requestMoneyGuid': requestGuid};
+    try {
+      _dio.options.headers['Authorization'] = 'Bearer $token';
+      _dio.options.method = 'GET';
+      res = await _dio.requestUri(
+        uri,
+        data: payload,
+      );
+    } catch (_) {
+      throw SpennHttpException();
+    }
+
+    if (res.statusCode != 200) {
+      throw SpennHttpRequestFailure(statusCode: res.statusCode, body: res.data);
+    }
+
+    if (res.data == null || res.data!.isEmpty) {
+      throw SpennTypeError();
+    }
+
+    try {
+      return DetailedPaymentRequest.fromMap(res.data!);
     } catch (_) {
       throw SpennJsonDeserializationException();
     }
