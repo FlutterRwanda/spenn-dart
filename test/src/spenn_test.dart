@@ -1,82 +1,75 @@
-import 'dart:convert';
-
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:spenn/spenn.dart';
 import 'package:spenn/src/spenn_errors.dart';
 import 'package:test/expect.dart';
 import 'package:test/scaffolding.dart';
 
-class MockHttpClient extends Mock implements http.Client {}
+class MockDio extends Mock implements Dio {
+  MockDio([BaseOptions? options]) : _options = options ?? BaseOptions();
+  final BaseOptions _options;
+  @override
+  BaseOptions get options => _options;
+}
 
 void main() {
-  late http.Client httpClient;
-  late Spenn subject;
+  late Dio dio;
+  late Spenn spenn;
 
   group('Spenn', () {
     setUp(() {
-      httpClient = MockHttpClient();
-      subject = Spenn(httpClient: httpClient);
+      dio = MockDio();
+      spenn = Spenn(dio: dio);
     });
 
     setUpAll(() {
-      registerFallbackValue<Uri>(Uri());
+      registerFallbackValue(Uri());
     });
 
-    test('returns constructor normally', () {
+    test('constructor returns normally', () {
       expect(() => Spenn(), returnsNormally);
     });
 
-    group('.authenticate', () {
-      const apiKey = 'api-key';
-      const clientId = 'client-id';
-      const clientSecret = '1234';
-      const audience = 'audience';
+    group('authenticate', () {
+      const apiKey = 'api-key-test';
+      const clientId = '1234';
+      const clientSecret = 'secret';
+      const audience = 'audience-test';
       const path = '/token';
-      const responseBody = <String, dynamic>{
+      final uri = Uri.https(Spenn.authority, path);
+      final options = RequestOptions(path: path, baseUrl: Spenn.authority);
+      final response = <String, dynamic>{
         'access_token': 'token',
         'token_type': 'bearer',
-        'expires_in': 1199,
-        'refresh_token': 'random stuff',
-        'clientId': 'randomClientID',
+        'expires_in': 12000,
+        'type': 'User',
+        'clientId': clientId,
         'audience': audience,
-        'type': 'user',
-        '.ssued': 'Sat, 21, 2021 10:12:00 GMT',
-        '.expires': 'Sat, 21, 2021 10:12:00 GMT'
-      };
-
-      const headers = {
-        'Accept': 'application/json',
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'refresh_token': 'refresh-token',
+        '.issued': '2021-08-31',
+        '.expires': '2021-09-01'
       };
 
       setUp(() {
-        when(
-          () => httpClient.post(
-            any(),
-            body: any(named: 'body'),
-            headers: headers,
+        when(() => dio.postUri(any(), data: any(named: 'data'))).thenAnswer(
+          (_) async => Response<Map<String, dynamic>>(
+            requestOptions: options,
+            data: response,
+            statusCode: 200,
           ),
-        ).thenAnswer(
-          (_) async => http.Response(json.encode(responseBody), 200),
         );
       });
 
-      test('calls httpClient.post', () async {
-        await subject.authenticate(
+      test('calls dio.postUri', () async {
+        await spenn.authenticate(
           apiKey: apiKey,
-          audience: audience,
           clientId: clientId,
           clientSecret: clientSecret,
+          audience: audience,
         );
-        verify(
-          () => httpClient.post(Uri.https(Spenn.authority, path),
-              body: any(named: 'body'), headers: headers),
-        ).called(1);
-      });
-      test('throws a SpenHttpException when http request fails', () {
-        when(() => httpClient.post(any(), body: any(named: 'body')))
-            .thenThrow(SpennHttpException());
+
+        verify(() => dio.postUri<Map<String, dynamic>>(uri,
+            data: any(named: 'data'))).called(1);
       });
     });
   });

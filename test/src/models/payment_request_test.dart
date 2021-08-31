@@ -6,17 +6,20 @@ void main() {
     const requestId = 'request-id';
     const id = 'test-id';
     const status = 'pending';
+    const externalRef = 'test';
 
     const subject = PaymentRequest(
       requestId: requestId,
       id: id,
       status: status,
+      externalRef: externalRef,
     );
 
     const testSubjectData = <String, dynamic>{
       r'$id': id,
       'requestId': requestId,
       'status': status,
+      'externalReference': 'test'
     };
 
     test('returns constructor normally', () {
@@ -29,7 +32,12 @@ void main() {
 
     test('has value comparison', () {
       expect(
-        const PaymentRequest(requestId: requestId, id: id, status: status),
+        const PaymentRequest(
+          requestId: requestId,
+          id: id,
+          status: status,
+          externalRef: externalRef,
+        ),
         equals(subject),
       );
     });
@@ -53,7 +61,11 @@ void main() {
           subject.copyWith(status: 'Failed'),
           equals(
             const PaymentRequest(
-                requestId: requestId, id: id, status: 'Failed'),
+              requestId: requestId,
+              id: id,
+              status: 'Failed',
+              externalRef: externalRef,
+            ),
           ),
         );
       });
