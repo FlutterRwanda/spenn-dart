@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:spenn/spenn.dart';
-import 'package:spenn/src/spenn_errors.dart';
 import 'package:test/expect.dart';
 import 'package:test/scaffolding.dart';
 

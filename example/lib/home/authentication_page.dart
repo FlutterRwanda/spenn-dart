@@ -69,7 +69,6 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                 )
                     .then(
                   (session) {
-                    print(session.toMap());
                     return ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('Authentication succeeded'),
