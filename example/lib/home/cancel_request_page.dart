@@ -56,7 +56,7 @@ class _CancelRequestPageState extends State<CancelRequestPage> {
               ElevatedButton(
                 onPressed: () => _spenn
                     .cancelRequest(
-                      requestMoneyGuid: _uidController.text.trim(),
+                      requestGuid: _uidController.text.trim(),
                       token: _tokenController.text.trim(),
                     )
                     .then(

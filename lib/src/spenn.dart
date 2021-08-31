@@ -13,7 +13,7 @@ class Spenn {
   /// An http Client object to handle http requests
   final Dio _dio;
 
-  /// API authority.
+  /// API url authority.
   ///
   /// exposed for testing purposes.
   @visibleForTesting
@@ -103,11 +103,11 @@ class Spenn {
 
   /// Cancel a payment request
   Future<PaymentRequest> cancelRequest({
-    required String requestMoneyGuid,
+    required String requestGuid,
     required String token,
   }) async {
     final uri = Uri.https(authority, '/api/Partner/transaction/request/cancel');
-    final payload = <String, String>{'requestMoneyGuid': requestMoneyGuid};
+    final payload = <String, String>{'requestMoneyGuid': requestGuid};
 
     Response<Map<String, dynamic>> res;
 
@@ -127,7 +127,7 @@ class Spenn {
 
     try {
       return PaymentRequest.fromMap(res.data!);
-    } catch (_) {
+    } catch (_, s) {
       throw SpennJsonDeserializationException();
     }
   }
@@ -145,10 +145,7 @@ class Spenn {
     try {
       _dio.options.headers['Authorization'] = 'Bearer $token';
       _dio.options.method = 'GET';
-      res = await _dio.requestUri(
-        uri,
-        data: payload,
-      );
+      res = await _dio.requestUri(uri, data: payload);
     } catch (_) {
       throw SpennHttpException();
     }

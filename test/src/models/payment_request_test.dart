@@ -43,7 +43,7 @@ void main() {
     });
 
     group('.fromMap', () {
-      test('create a new PaymentRequest object from given map of data', () {
+      test('creates a new PaymentRequest object from given map of data', () {
         expect(PaymentRequest.fromMap(testSubjectData), equals(subject));
       });
     });
