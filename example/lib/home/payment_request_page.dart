@@ -73,7 +73,7 @@ class _PaymentRequestPageState extends State<PaymentRequestPage> {
                       amount: double.parse(_amountController.text),
                       message: _messageController.text.trim(),
                       externalReference: _referenceController.text,
-                      apiKey: _apiKeyController.text,
+                      token: _apiKeyController.text,
                     )
                     .then(
                       (payment) => ScaffoldMessenger.of(context).showSnackBar(
@@ -87,9 +87,9 @@ class _PaymentRequestPageState extends State<PaymentRequestPage> {
                     .onError(
                   (error, stackTrace) {
                     return ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
+                      SnackBar(
                         backgroundColor: Colors.red,
-                        content: Text('Failed'),
+                        content: Text('Failed ${error.toString()}'),
                       ),
                     );
                   },

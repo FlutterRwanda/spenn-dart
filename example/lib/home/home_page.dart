@@ -1,4 +1,5 @@
 import 'package:example/home/authentication_page.dart';
+import 'package:example/home/cancel_request_page.dart';
 import 'package:example/home/payment_request_page.dart';
 import 'package:flutter/material.dart';
 
@@ -27,6 +28,12 @@ class HomePage extends StatelessWidget {
                   MaterialPageRoute(
                       builder: (_) => const PaymentRequestPage())),
               child: const Text('Payment Request'),
+            ),
+            const SizedBox(height: 25),
+            ElevatedButton(
+              onPressed: () =>
+                  Navigator.of(context).push<dynamic>(CancelRequestPage.open()),
+              child: const Text('Cancel Request'),
             )
           ],
         ),

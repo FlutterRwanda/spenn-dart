@@ -62,28 +62,30 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
               ElevatedButton(
                 onPressed: () => _spenn
                     .authenticate(
-                      apiKey: _apikeyController.text.trim(),
-                      clientId: _clientIdController.text.trim(),
-                      clientSecret: _clientSecretController.text.trim(),
-                      audience: _audienceController.text.trim(),
-                    )
+                  apiKey: _apikeyController.text.trim(),
+                  clientId: _clientIdController.text.trim(),
+                  clientSecret: _clientSecretController.text.trim(),
+                  audience: _audienceController.text.trim(),
+                )
                     .then(
-                      (session) => ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Authentication succeeded'),
-                          backgroundColor: Colors.green,
-                        ),
+                  (session) {
+                    print(session.toMap());
+                    return ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Authentication succeeded'),
+                        backgroundColor: Colors.green,
                       ),
-                    )
-                    .onError(
-                      (error, stackTrace) =>
-                          ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Failure!, $error'),
-                          backgroundColor: Colors.red,
-                        ),
-                      ),
+                    );
+                  },
+                ).onError(
+                  (error, stackTrace) =>
+                      ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Failure!, $error'),
+                      backgroundColor: Colors.red,
                     ),
+                  ),
+                ),
                 child: const Text('Authenticate'),
               ),
             ],
