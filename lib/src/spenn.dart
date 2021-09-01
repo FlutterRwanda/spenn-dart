@@ -129,7 +129,7 @@ class Spenn {
 
     try {
       return PaymentRequest.fromMap(res.data!);
-    } catch (_, s) {
+    } catch (_) {
       throw SpennJsonDeserializationException();
     }
   }
