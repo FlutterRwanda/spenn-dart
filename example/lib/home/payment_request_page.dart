@@ -67,8 +67,8 @@ class _PaymentRequestPageState extends State<PaymentRequestPage> {
                 decoration: const InputDecoration(labelText: 'API Key'),
               ),
               ElevatedButton(
-                /// The switch can be added so it can be given
-                /// when calling the spenn sdk
+                ///NOTE: The switch can be added so it can be given
+                ///NOTE: when calling the spenn sdk
                 ///
                 onPressed: () => _spenn
                     .createRequest(
