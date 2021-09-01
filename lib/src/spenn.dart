@@ -16,6 +16,8 @@ class Spenn {
   /// API url authority.
   ///
   /// exposed for testing purposes.
+  /// TODO: uat- should be removed when used in production. maybe this should be
+  /// configurable like a variable to be toggled on and off.
   @visibleForTesting
   static const authority = 'uat-idsrv.spenn.com';
 
