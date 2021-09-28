@@ -17,10 +17,10 @@ class PaymentRequest extends Equatable {
 
   /// Generates a new instance of [PaymentRequest] from a given map of data
   factory PaymentRequest.fromMap(Map<String, dynamic> data) => PaymentRequest(
-        requestId: data['requestId'] as String,
+        requestId: "data['requestId'] as String",
         id: data[r'$id'] as String,
         status: data['status'] as String,
-        externalRef: data['externalReference'] as String,
+        externalRef: data['externalReference'],
       );
 
   /// ID

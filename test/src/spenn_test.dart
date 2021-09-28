@@ -180,7 +180,7 @@ void main() {
           amount: amount,
           message: message,
           externalReference: externalReference,
-          token: token,
+          bearerToken: token,
         );
 
         verify(() => dio.postUri<Map<String, dynamic>>(uri,
@@ -196,7 +196,7 @@ void main() {
             amount: amount,
             message: message,
             externalReference: externalReference,
-            token: token,
+            bearerToken: token,
           ),
           throwsA(isA<SpennHttpException>()),
         );
@@ -218,7 +218,7 @@ void main() {
             amount: amount,
             message: message,
             externalReference: externalReference,
-            token: token,
+            bearerToken: token,
           ),
           throwsA(isA<SpennHttpRequestFailure>()),
         );
@@ -241,7 +241,7 @@ void main() {
                   amount: amount,
                   message: message,
                   externalReference: externalReference,
-                  token: token,
+                  bearerToken: token,
                 ),
             throwsA(isA<SpennTypeError>()));
       });
@@ -264,7 +264,7 @@ void main() {
                   amount: amount,
                   message: message,
                   externalReference: externalReference,
-                  token: token,
+                  bearerToken: token,
                 ),
             throwsA(isA<SpennJsonDeserializationException>()));
       });

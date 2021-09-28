@@ -15,6 +15,7 @@ class _PaymentRequestPageState extends State<PaymentRequestPage> {
   late TextEditingController _messageController;
   late TextEditingController _referenceController;
   late TextEditingController _apiKeyController;
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -33,12 +34,24 @@ class _PaymentRequestPageState extends State<PaymentRequestPage> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
+          key: _formKey,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextFormField(
                 controller: _phoneNumberController,
+
+                /// regex to validate a Rwandan phone number
+                validator: (value) {
+                  if (value == null) {
+                    return 'Please enter a phone number';
+                  }
+                  // the regex is not perfect, but it's good enough for this example, to stress that a phone number is important.
+                  if (!RegExp(r'^\+2507[0-9]{8}$').hasMatch(value)) {
+                    return 'Please enter a valid Rwandan phone number';
+                  }
+                },
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(labelText: 'PhoneNumber'),
               ),
@@ -67,36 +80,59 @@ class _PaymentRequestPageState extends State<PaymentRequestPage> {
                 decoration: const InputDecoration(labelText: 'API Key'),
               ),
               ElevatedButton(
-                ///NOTE: The switch can be added so it can be given
-                ///NOTE: when calling the spenn sdk
-                ///
-                onPressed: () => _spenn
-                    .createRequest(
-                      phoneNumber: _phoneNumberController.text.trim(),
-                      amount: double.parse(_amountController.text),
-                      message: _messageController.text.trim(),
-                      externalReference: _referenceController.text,
-                      token: _apiKeyController.text,
+                /// upon the create request re-authenticate the user again!
+                /// will imprement refresher token so this can be simplified .
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    _spenn
+                        .authenticate(
+                      apiKey: _apiKeyController.text,
+                      clientId: 'SpennBusinessApiKey',
+                      clientSecret: '1234',
+                      audience: 'SpennBusiness',
                     )
-                    .then(
-                      (payment) => ScaffoldMessenger.of(context).showSnackBar(
+                        .then(
+                      (session) {
+                        _spenn
+                            .createRequest(
+                              phoneNumber: _phoneNumberController.text.trim(),
+                              amount: double.parse(_amountController.text),
+                              message: _messageController.text.trim(),
+                              externalReference:
+                                  _referenceController.text.trim(),
+                              bearerToken: session.token,
+                            )
+                            .then(
+                              (payment) =>
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  backgroundColor: Colors.green,
+                                  content: Text('Payment requested, '
+                                      'current status: ${payment.status}'),
+                                ),
+                              ),
+                            )
+                            .onError(
+                          (error, stackTrace) {
+                            return ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                backgroundColor: Colors.red,
+                                content: Text('Failed ${error.toString()}'),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ).onError((error, stackTrace) {
+                      ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          backgroundColor: Colors.green,
-                          content: Text('Payment requested, '
-                              'current status: ${payment.status}'),
+                          content: Text('Failure!, $error'),
+                          backgroundColor: Colors.red,
                         ),
-                      ),
-                    )
-                    .onError(
-                  (error, stackTrace) {
-                    return ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        backgroundColor: Colors.red,
-                        content: Text('Failed ${error.toString()}'),
-                      ),
-                    );
-                  },
-                ),
+                      );
+                    });
+                  }
+                },
                 child: const Text('Create Request'),
               )
             ],

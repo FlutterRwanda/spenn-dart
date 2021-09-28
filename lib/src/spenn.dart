@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:meta/meta.dart';
 import 'package:spenn/src/models/models.dart';
@@ -20,6 +22,7 @@ class Spenn {
   /// configurable like a variable to be toggled on and off.
   @visibleForTesting
   static const authority = 'uat-idsrv.spenn.com';
+  static const requestAuthority = 'uat-businessapi.spenn.com';
 
   /// Autenticate a Business Partner account.
   /// Returns an instance of [SpennSession]
@@ -71,35 +74,42 @@ class Spenn {
     required double amount,
     required String message,
     required String externalReference,
-    required String token,
+    required String bearerToken,
   }) async {
-    final uri = Uri.https(authority, '/api/Partner/transaction/request');
+    final uri = Uri.https(requestAuthority, '/api/Partner/transaction/request');
     final payload = <String, dynamic>{
       'phoneNumber': phoneNumber,
       'amount': amount,
       'message': message,
-      'externalReference': externalReference,
+      // 'externalReference': externalReference,
     };
     Response<Map<String, dynamic>> res;
 
     try {
-      _dio.options.headers['Authorization'] = 'Bearer $token';
-      res = await _dio.postUri(uri, data: payload);
-    } catch (_) {
+      print('bearerToken: $bearerToken');
+      print('message: $message');
+      print('message: $phoneNumber');
+      _dio.options.headers['Authorization'] = 'Bearer $bearerToken';
+      _dio.options.headers['Content-Type'] = 'application/json';
+      res = await _dio.postUri(uri, data: jsonEncode(payload));
+      if (res.statusCode != 200) {
+        throw SpennHttpRequestFailure(
+            statusCode: res.statusCode, body: res.data);
+      }
+
+      if (res.data == null || res.data!.isEmpty) {
+        throw SpennTypeError();
+      }
+
+      try {
+        print(res.data!);
+        return PaymentRequest.fromMap(res.data!);
+      } catch (_) {
+        throw SpennJsonDeserializationException();
+      }
+    } catch (e) {
+      print(e);
       throw SpennHttpException();
-    }
-    if (res.statusCode != 200) {
-      throw SpennHttpRequestFailure(statusCode: res.statusCode, body: res.data);
-    }
-
-    if (res.data == null || res.data!.isEmpty) {
-      throw SpennTypeError();
-    }
-
-    try {
-      return PaymentRequest.fromMap(res.data!);
-    } catch (_) {
-      throw SpennJsonDeserializationException();
     }
   }
 
